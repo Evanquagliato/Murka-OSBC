@@ -21,7 +21,7 @@ class SocketError(Exception):
 
 class MorgHTTPSocket:
     def __init__(self):
-        self.base_endpoint = "http://localhost:8081/"
+        self.base_endpoint = "http://localhost:8080/"
 
         self.inv_endpoint = "inv"
         self.stats_endpoint = "stats"

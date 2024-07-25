@@ -6,6 +6,7 @@ import ctypes
 import platform
 import re
 import threading
+import decimal
 import time
 import warnings
 from abc import ABC, abstractmethod
@@ -311,6 +312,23 @@ class Bot(ABC):
         self.mouse.move_rel(0, -53, 5, 5)
         self.mouse.click()
 
+    def login(self):  # sourcery skip: class-extract-method
+        """
+        Logs player in.
+        """
+        self.log_msg("Logging in...")
+        login_img = imsearch.BOT_IMAGES.joinpath("ui_templates", "login_button.png")
+        if login := imsearch.search_img_in_rect(login_img, self.win.game_view):
+            self.mouse.move_to(login.random_point())
+            self.mouse.click()
+            self.take_break(min_seconds=10, max_seconds=15, fancy=True)
+            play_img = imsearch.BOT_IMAGES.joinpath("ui_templates", "click_to_play.png")
+            if play := imsearch.search_img_in_rect(play_img, self.win.game_view):
+                self.mouse.move_to(play.random_point())
+                self.mouse.click()
+                self.take_break(min_seconds=5, max_seconds=10, fancy=True)
+            
+
     def take_break(self, min_seconds: int = 1, max_seconds: int = 30, fancy: bool = False):
         """
         Takes a break for a random amount of time.
@@ -329,7 +347,11 @@ class Bot(ABC):
         for i in range(length):
             self.log_msg(f"Taking a break... {int(length) - i} seconds left.", overwrite=True)
             time.sleep(1)
-        self.log_msg(f"Done taking {length} second break.", overwrite=True)
+        # Add's a decimal sleep so the sleep time isn't a precise second - More human like
+        decimalSleep = round(rd.fancy_normal_sample(0,1),3)
+        time.sleep(decimalSleep)
+        self.log_msg(f"Done taking {length + decimalSleep} second break.", overwrite=True)
+
 
     # --- Player Status Functions ---
     def has_hp_bar(self) -> bool:

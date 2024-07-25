@@ -1,2 +1,1 @@
-from .combat.combat import OSRSCombat
-from .woodcutter import OSRSWoodcutter
+from .Fishing.barbarian_fishing import OSRSBarbFishing
