@@ -19080,3 +19080,17 @@ rods = [
     RING_OF_DUELING7,
     RING_OF_DUELING8,
 ]
+
+overloads = [
+    OVERLOAD_1,
+    OVERLOAD_2,
+    OVERLOAD_3,
+    OVERLOAD_4
+]
+
+absorbs = [
+    ABSORPTION_1,
+    ABSORPTION_2,
+    ABSORPTION_3,
+    ABSORPTION_4
+]

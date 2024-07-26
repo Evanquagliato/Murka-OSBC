@@ -73,28 +73,35 @@ class OSRSBarbFishing(OSRSBot):
         # Main loop
         start_time = time.time()
         end_time = self.running_time * 60
+        # Starts out by finding a node
         self.fishing()
         while time.time() - start_time < end_time:
             
-
+            # Check if inventory is full, if so dump the inventory
             fish_slots = api_m.get_inv_item_indices(ids.raw_fish)
             if api_m.get_is_inv_full():
                 self.log_msg("Inventory is full")
+                # Low chance of long sleep, always shorter sleep
+                # As if afking fishing
                 if rd.random_chance(probability=0.05):
                     self.log_msg("Taking long break")
                     self.take_break(max_seconds=60, fancy=True)
                 self.take_break(max_seconds=10, fancy=True)
+                # Drop the fish then continue fishing
                 self.drop(fish_slots)
                 time.sleep(3)
                 self.fishing()
 
-            
+            # Check if the player is idle by checking the top left activity
             if not self.is_player_doing_action("Fishing"):
                 self.log_msg("Player isn't fishing")
+                # Low chance of long sleep, always shorter sleep
+                # As if afking fishing
                 if rd.random_chance(probability=0.05):
                     self.log_msg("Taking long break")
                     self.take_break(max_seconds=60, fancy=True)
                 self.take_break(max_seconds=20, fancy=True)
+                # Finds a new node then continues fishing
                 self.fishing()
             time.sleep(1)
 
@@ -104,7 +111,9 @@ class OSRSBarbFishing(OSRSBot):
         self.log_msg("Finished.")
         self.stop()
 
-
+    # Method for fishing.
+    # Looks for closest node and clicks
+    # Sleeps for 5 seconds to allow time for status panel to update
     def fishing(self):
         if fish := self.get_nearest_tag(clr.PINK):
                 self.mouse.move_to(fish.random_point())

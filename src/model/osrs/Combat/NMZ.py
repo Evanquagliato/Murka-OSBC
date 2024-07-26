@@ -8,10 +8,10 @@ from utilities.api.morg_http_client import MorgHTTPSocket
 from utilities.api.status_socket import StatusSocket
 
 
-class OSRSTemplate(OSRSBot):
+class OSRSnmz(OSRSBot):
     def __init__(self):
-        bot_title = "<Script name here>"
-        description = "<Script description here>"
+        bot_title = "Nightmare Zone"
+        description = "AFKs Nightmare Zone - 72 Overload, 1 Locator Orb, Rest Absorbs"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during headless testing)
         self.running_time = 1
@@ -24,9 +24,6 @@ class OSRSTemplate(OSRSBot):
         unpack the dictionary of options after the user has selected them.
         """
         self.options_builder.add_text_edit_option("running_time", "How long to run (minutes)?", "Number Only")
-        #self.options_builder.add_text_edit_option("text_edit_example", "Text Edit Example", "Placeholder text here")
-        #self.options_builder.add_checkbox_option("multi_select_example", "Multi-select Example", ["A", "B", "C"])
-        #self.options_builder.add_dropdown_option("menu_example", "Menu Example", ["A", "B", "C"])
 
     def save_options(self, options: dict):
         """
@@ -41,12 +38,6 @@ class OSRSTemplate(OSRSBot):
                 else:
                     self.running_time = 60
                     self.log_msg("You didn't enter a number, so you've been set to 60 minutes")
-            #elif option == "text_edit_example":
-            #    self.log_msg(f"Text edit example: {options[option]}")
-            #elif option == "multi_select_example":
-            #    self.log_msg(f"Multi-select example: {options[option]}")
-            #elif option == "menu_example":
-            #    self.log_msg(f"Menu example: {options[option]}")
             else:
                 self.log_msg(f"Unknown option: {option}")
                 print("Developer: ensure that the option keys are correct, and that options are being unpacked correctly.")
@@ -72,15 +63,75 @@ class OSRSTemplate(OSRSBot):
           operator to access their functions.
         """
         # Setup APIs
-        # api_m = MorgHTTPSocket()
+        api_m = MorgHTTPSocket()
         # api_s = StatusSocket()
 
         # Main loop
         start_time = time.time()
         end_time = self.running_time * 60
-        while time.time() - start_time < end_time:
-            # -- Perform bot actions here --
-            # Code within this block will LOOP until the bot is stopped.
+
+        # Find the locator orb in bag
+        locatorOrb = api_m.get_first_occurrence(item_id=self.item_ids.LOCATOR_ORB)
+
+        # Set the flick counter to determine when to flick
+        flickCount = rd.truncated_normal_sample(20,30)
+        flickCount = round(flickCount)
+
+        # Set the absorb counter to determine when to drink an absorb
+        absorbCount = rd.truncated_normal_sample(60,120)
+        absorbCount = round(absorbCount)
+
+        while time.time() - start_time < end_time:           
+            # Checks if HP is greater than 2
+            # If it is, that means the overload has expired
+            # Time to drink another one
+            if self.get_hp() > 2:
+                self.log_msg("HP is below 2")
+                # Finds the first overload in the bag and clicks it
+                # Waits 10 seconds for it to take effect
+                # Then hits locator orb in case an HP level was gained
+                if overload := api_m.get_first_occurrence(item_id=self.item_ids.overloads):
+                    self.log_msg("Found an overload, time to drink")
+                    self.mouse.move_to(overload.random_point())
+                    self.mouse.click()
+                    self.take_break(9,11)
+                    self.mouse.move_to(locatorOrb.random_point())
+                    self.mouse.click()
+                # If it finds the HP is greater than 2, but doesn't find any Overloads left
+                # Stop the script, let the 20 min logout take the wheel
+                else:
+                    self.log_msg("No overloads found, stopping script")
+                    self.stop()
+            # Absorb count increments down every loop
+            # Once it hits 0, it finds an absorb pot, drinks it
+            # Then it calculates a new absorb count
+            if absorbCount == 0:
+                self.log_msg("Absorb count is 0")
+                if absorb := api_m.get_first_occurrence(item_id=self.item_ids.absorbs):
+                    self.log_msg("Found an absorb, time to drink")
+                    self.mouse.move_to(absorb.random_point())
+                    self.mouse.click()
+                    absorbCount = rd.truncated_normal_sample(60,120)
+                    absorbCount = round(absorbCount)
+                    self.log_msg(f"New absorb count is {absorbCount}")
+                else:
+                    self.log_msg("No absorbs found")
+            # Flick count increments down every loop
+            # Once it hits 0, it finds the prayer icon and flicks it
+            # Then it calculates a new flick count
+            if flickCount == 0:
+                self.log_msg("Flick count is 0, time to flick")
+                self.mouse.move_to(self.win.prayer_orb.random_point())
+                self.mouse.click()
+                self.take_break(0,1)
+                self.mouse.click()
+                flickCount = rd.truncated_normal_sample(60,120)
+                flickCount = round(flickCount)
+                self.log_msg(f"New flick count is {flickCount}")
+            
+            # Increment the counters down
+            flickCount -= 1
+            absorbCount -= 1
 
             self.update_progress((time.time() - start_time) / end_time)
 
