@@ -75,11 +75,11 @@ class OSRSnmz(OSRSBot):
         # Set the flick counter to determine when to flick
         flickCount = rd.truncated_normal_sample(20,30)
         flickCount = round(flickCount)
-        self.log_msg(f"New absorb count is {flickCount}")
+        self.log_msg(f"Initial flick count is {flickCount}")
         # Set the absorb counter to determine when to drink an absorb
         absorbCount = rd.truncated_normal_sample(60,120)
         absorbCount = round(absorbCount)
-        self.log_msg(f"New absorb count is {absorbCount}")
+        self.log_msg(f"Initial absorb count is {absorbCount}")
 
         while time.time() - start_time < end_time:           
             # Checks if HP is greater than 2
@@ -128,7 +128,7 @@ class OSRSnmz(OSRSBot):
                 self.mouse.click()
                 self.take_break(0,1)
                 self.mouse.click()
-                flickCount = rd.truncated_normal_sample(60,120)
+                flickCount = rd.truncated_normal_sample(20,30)
                 flickCount = round(flickCount)
                 self.log_msg(f"New flick count is {flickCount}")
             
