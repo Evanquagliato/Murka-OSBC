@@ -1,5 +1,4 @@
 import time
-
 import utilities.api.item_ids as ids
 import utilities.color as clr
 import utilities.random_util as rd
@@ -71,31 +70,34 @@ class OSRSnmz(OSRSBot):
         end_time = self.running_time * 60
 
         # Find the locator orb in bag
-        locatorOrb = api_m.get_first_occurrence(item_id=self.item_ids.LOCATOR_ORB)
-
+        locatorOrb = api_m.get_first_occurrence(ids.LOCATOR_ORB)
+        self.log_msg("Orb found")
         # Set the flick counter to determine when to flick
         flickCount = rd.truncated_normal_sample(20,30)
         flickCount = round(flickCount)
-
+        self.log_msg(f"New absorb count is {flickCount}")
         # Set the absorb counter to determine when to drink an absorb
         absorbCount = rd.truncated_normal_sample(60,120)
         absorbCount = round(absorbCount)
+        self.log_msg(f"New absorb count is {absorbCount}")
 
         while time.time() - start_time < end_time:           
             # Checks if HP is greater than 2
             # If it is, that means the overload has expired
             # Time to drink another one
+            
             if self.get_hp() > 2:
                 self.log_msg("HP is below 2")
                 # Finds the first overload in the bag and clicks it
                 # Waits 10 seconds for it to take effect
                 # Then hits locator orb in case an HP level was gained
-                if overload := api_m.get_first_occurrence(item_id=self.item_ids.overloads):
+                overload = api_m.get_first_occurrence(ids.overloads)
+                if overload:
                     self.log_msg("Found an overload, time to drink")
-                    self.mouse.move_to(overload.random_point())
+                    self.mouse.move_to(self.win.inventory_slots[overload[0]].random_point())
                     self.mouse.click()
                     self.take_break(9,11)
-                    self.mouse.move_to(locatorOrb.random_point())
+                    self.mouse.move_to(self.win.inventory_slots[locatorOrb[0]].random_point())
                     self.mouse.click()
                 # If it finds the HP is greater than 2, but doesn't find any Overloads left
                 # Stop the script, let the 20 min logout take the wheel
@@ -107,9 +109,10 @@ class OSRSnmz(OSRSBot):
             # Then it calculates a new absorb count
             if absorbCount == 0:
                 self.log_msg("Absorb count is 0")
-                if absorb := api_m.get_first_occurrence(item_id=self.item_ids.absorbs):
+                absorb = api_m.get_first_occurrence(ids.absorbs)
+                if absorb:
                     self.log_msg("Found an absorb, time to drink")
-                    self.mouse.move_to(absorb.random_point())
+                    self.mouse.move_to(self.win.inventory_slots[absorb[0]].random_point())
                     self.mouse.click()
                     absorbCount = rd.truncated_normal_sample(60,120)
                     absorbCount = round(absorbCount)
