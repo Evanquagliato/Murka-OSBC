@@ -97,8 +97,8 @@ class OSRSnmz(OSRSBot):
                     self.mouse.move_to(self.win.inventory_slots[overload[0]].random_point())
                     self.mouse.click()
                     self.take_break(9,11)
-                    self.mouse.move_to(self.win.inventory_slots[locatorOrb[0]].random_point())
-                    self.mouse.click()
+                    #self.mouse.move_to(self.win.inventory_slots[locatorOrb[0]].random_point())
+                    #self.mouse.click()
                 # If it finds the HP is greater than 2, but doesn't find any Overloads left
                 # Stop the script, let the 20 min logout take the wheel
                 else:
