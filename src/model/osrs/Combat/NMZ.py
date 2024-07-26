@@ -107,35 +107,35 @@ class OSRSnmz(OSRSBot):
             # Absorb count increments down every loop
             # Once it hits 0, it finds an absorb pot, drinks it
             # Then it calculates a new absorb count
-            if self.absorbCount == 0:
+            if absorbCount == 0:
                 self.log_msg("Absorb count is 0")
                 absorb = api_m.get_first_occurrence(ids.absorbs)
                 if absorb:
                     self.log_msg("Found an absorb, time to drink")
                     self.mouse.move_to(self.win.inventory_slots[absorb[0]].random_point())
                     self.mouse.click()
-                    self.absorbCount = rd.truncated_normal_sample(60,120)
-                    self.absorbCount = round(absorbCount)
-                    self.log_msg(f"New absorb count is {self.absorbCount}")
+                    absorbCount = rd.truncated_normal_sample(60,120)
+                    absorbCount = round(absorbCount)
+                    self.log_msg(f"New absorb count is {absorbCount}")
                 else:
                     self.log_msg("No absorbs found")
             # Flick count increments down every loop
             # Once it hits 0, it finds the prayer icon and flicks it
             # Then it calculates a new flick count
-            if self.flickCount == 0:
+            if flickCount == 0:
                 self.log_msg("Flick count is 0, time to flick")
                 self.mouse.move_to(self.win.prayer_orb.random_point())
                 self.mouse.click()
                 self.take_break(0,1)
                 self.mouse.click()
-                self.flickCount = rd.truncated_normal_sample(60,120)
-                self.flickCount = round(self.flickCount)
-                self.log_msg(f"New flick count is {self.flickCount}")
+                flickCount = rd.truncated_normal_sample(60,120)
+                flickCount = round(flickCount)
+                self.log_msg(f"New flick count is {flickCount}")
             
             # Increment the counters down
             flickCount -= 1
             absorbCount -= 1
-
+            time.sleep(1)
             self.update_progress((time.time() - start_time) / end_time)
 
         self.update_progress(1)
