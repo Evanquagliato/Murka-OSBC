@@ -126,7 +126,7 @@ class OSRSnmz(OSRSBot):
                 self.log_msg("Flick count is 0, time to flick")
                 self.mouse.move_to(self.win.prayer_orb.random_point())
                 self.mouse.click()
-                self.take_break(0,1)
+                self.take_break(0,0)
                 self.mouse.click()
                 flickCount = rd.truncated_normal_sample(20,30)
                 flickCount = round(flickCount)
