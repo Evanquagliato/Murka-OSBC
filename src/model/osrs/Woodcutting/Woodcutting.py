@@ -1,5 +1,5 @@
 import time
-
+from pyautogui import press, typewrite, hotkey
 import utilities.api.item_ids as ids
 import utilities.color as clr
 import utilities.random_util as rd
@@ -8,13 +8,13 @@ from utilities.api.morg_http_client import MorgHTTPSocket
 from utilities.api.status_socket import StatusSocket
 
 
-class OSRSBarbFishing(OSRSBot):
+class OSRSWoodcutting(OSRSBot):
     def __init__(self):
-        bot_title = "Barbairan Fishing"
-        description = "AFK Barbarian Fishing"
+        bot_title = "Woodcutting"
+        description = "Hold a knife to fletch arrow shafts, otherwise it'll drop. Mark any trees pink and it'll do the rest"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during headless testing)
-        self.running_time = 1
+        self.runningTime = 1
 
     def create_options(self):
         """
@@ -62,55 +62,84 @@ class OSRSBarbFishing(OSRSBot):
         api_m = MorgHTTPSocket()
         # api_s = StatusSocket()
 
+        # Find if we have a knife
+
+
+        # Start by woodcutting
+        self.woodcut()
+
         # Main loop
         start_time = time.time()
         end_time = self.runningTime * 60
-        # Starts out by finding a node
-        self.fishing()
         while time.time() - start_time < end_time:
             datime = time.time() - start_time
-            # Check if inventory is full, if so dump the inventory
-            fish_slots = api_m.get_inv_item_indices(ids.raw_fish)
-            if api_m.get_is_inv_full():
-                self.log_msg("Inventory is full")
-                # Low chance of long sleep, always shorter sleep
-                # As if afking fishing
-                if rd.random_chance(probability=0.05):
-                    self.log_msg("Taking long break")
-                    self.take_break(max_seconds=60, fancy=True)
-                self.take_break(max_seconds=10, fancy=True)
-                # Drop the fish then continue fishing
-                self.drop(fish_slots)
-                time.sleep(3)
-                self.fishing()
+            # Check if our inventory is full
+            # If so, drop
+            self.dropInv(api = api_m)
 
-            # Check if the player is idle by checking the top left activity
-            if not self.is_player_doing_action("Fishing"):
-                self.log_msg("Player isn't fishing")
-                # Low chance of long sleep, always shorter sleep
-                # As if afking fishing
-                if rd.random_chance(probability=0.05):
-                    self.log_msg("Taking long break")
-                    self.take_break(max_seconds=60, fancy=True)
-                self.take_break(max_seconds=20, fancy=True)
-                # Finds a new node then continues fishing
-                self.fishing()
-            self.sleepRunner(datime)
-            time.sleep(1)
+            # If it's not woodcutting, have a chance at taking breaks
+            # Then, try and find a tree to cut
             
+            if not self.is_player_doing_action("Woodcutting"):
+                self.log_msg("Stopped woodcutting, looking for new tree")
+                if rd.random_chance(probability=0.2):
+                    self.take_break(min_seconds=3,max_seconds=5,fancy=True)
+                if rd.random_chance(probability=0.05):
+                    self.take_break(min_seconds=30, max_seconds=60,fancy=True)
+                self.woodcut()
+            
+            
+            self.sleepRunner(datime)
+
+            time.sleep(1)
             self.update_progress((time.time() - start_time) / end_time)
 
         self.update_progress(1)
         self.log_msg("Finished.")
         self.stop()
 
-    # Method for fishing.
-    # Looks for closest node and clicks
-    # Sleeps for 5 seconds to allow time for status panel to update
-    def fishing(self):
-        if fish := self.get_nearest_tag(clr.PINK):
-                self.mouse.move_to(fish.random_point())
+    # Woodcutting method
+    def woodcut(self):  
+        # Tries to find a tree tagged with pink
+        # If a tree found, moves the mouse, confirms mouseover text, and clicks
+        # If a tree is not found, dumps inventory while it waits for tree respawn
+        if trees := self.get_nearest_tag(clr.PINK):
+            self.mouse.move_to(trees.random_point())
+            if self.mouseover_text(contains="Chop"):
                 self.mouse.click()
-                self.log_msg("Found a new node")
+                self.log_msg("Found a tree, woodcutting..")
                 time.sleep(5)
+            else:
+                self.log_msg("Mouseover mismatch, trying again")
+        else:
+            self.log_msg("Couldn't find a tree, looking again")
+    
+    # Inv drop script
+    def dropInv(self,api):
+        # Looks for logs in the inventory
+        # Drops all the logs found
+        knife = api.get_first_occurrence(ids.KNIFE)
+        # If we are holding a knife, fletch the logs into arrow shafts
+        time.sleep(1)
+        if api.get_is_inv_full():
+            time.sleep(1)
+            if not knife:
+                self.log_msg("Time to fletch some arrow shafts")
+                self.mouse.move_to(self.win.inventory_slots[knife].random_point())
+                self.mouse.click()
+                log = api.get_first_occurrence(ids.logs)
+                self.mouse.move_to(self.win.inventory_slots[log[0]].random_point())
+                self.mouse.click()
+                time.sleep(2)
+                press('Space')
+                self.take_break(min_seconds=60,max_seconds=75,fancy=True)
+        
+        # If we aren't holding a knife, just drop the logs
+            else:
+                log_slots = api.get_inv_item_indices(ids.logs)
+                self.log_msg("Inventory is full, dumping inv")
+                self.drop(log_slots)
+                time.sleep(3)
+                self.woodcut()
+    
     

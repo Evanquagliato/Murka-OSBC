@@ -352,6 +352,62 @@ class Bot(ABC):
         time.sleep(decimalSleep)
         self.log_msg(f"Done taking {length + decimalSleep} second break.", overwrite=True)
 
+    def buildStandOpt(self):
+        self.options_builder.add_text_edit_option("runningTime", "How long to run (minutes)?", "Number Only")
+        self.options_builder.add_dropdown_option("takeLogouts", "Take logout breaks every 60-90 min for 10-20 min?", ["No","Yes"])
+        self.options_builder.add_dropdown_option("takeLongLogouts", "Take logout breaks every 4-6 hrs for 45-75 min?", ["No","Yes"])
+        self.options_builder.add_dropdown_option("takeExtremeLogouts", "Take sleep breaks every 14-16 hrs for 6-8 hours?", ["No","Yes"])
+
+    def setStandOpt(self,option,value):
+        if option == "runningTime":
+            if isinstance(int(value), int):
+                self.runningTime = int(value)
+            else:
+                self.runningTime = 60
+                self.log_msg("You didn't enter a number, so you've been set to 60 minutes")
+        elif option == "takeLogouts":
+            self.takeLogouts = value == "Yes"
+            self.logoutTimer = rd.fancy_normal_sample(3600,5400)
+            self.logoutTimer = round(self.logoutTimer)
+            self.log_msg(f"Next normal break at {self.logoutTimer / 60} minutes")
+        elif option == "takeLongLogouts":
+            self.takeLongLogouts = value == "Yes"
+            self.longTimer = rd.fancy_normal_sample(14400,21600)
+            self.longTimer = round(self.longTimer)
+            self.log_msg(f"Next long break at {self.longTimer / 60} minutes")
+        elif option == "takeExtremeLogouts":
+            self.takeExtremeLogouts = value == "Yes"
+            self.extremeTimer = rd.fancy_normal_sample(50400,57600)
+            self.extremeTimer = round(self.extremeTimer)
+            self.log_msg(f"Next extreme break at {self.extremeTimer / 60} minutes")
+        else:
+            return False
+        return True
+
+    def sleepRunner(self,timeClock):
+        if timeClock > self.logoutTimer and self.takeLogouts :
+            self.logout()
+            self.take_break(min_seconds=600,max_seconds=1200,fancy=True)
+            self.login()
+            self.logoutTimer = rd.fancy_normal_sample(3600,5400) + timeClock
+            self.logoutTimer = round(self.logoutTimer)
+            self.log_msg(f"Next normal break at {self.logoutTimer / 60} minutes")
+
+        if timeClock > self.longTimer and self.takeLongLogouts:
+            self.logout()
+            self.take_break(min_seconds=2700,max_seconds=4500,fancy=True)
+            self.login()
+            self.longTimer = rd.fancy_normal_sample(14400,21600) + timeClock
+            self.longTimer = round(self.longTimer)
+            self.log_msg(f"Next long break at {self.longTimer / 60} minutes")
+
+        if timeClock > self.extremeTimer and self.takeExtremeLogouts:
+            self.logout()
+            self.take_break(min_seconds=21600,max_seconds=28800,fancy=True)
+            self.login()
+            self.extremeTimer = rd.fancy_normal_sample(50400,57600) + timeClock
+            self.extremeTimer = round(self.extremeTimer)
+            self.log_msg(f"Next extreme break at {self.extremeTimer / 60} minutes")
 
     # --- Player Status Functions ---
     def has_hp_bar(self) -> bool:

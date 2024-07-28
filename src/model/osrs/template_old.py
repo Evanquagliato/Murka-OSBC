@@ -8,10 +8,10 @@ from utilities.api.morg_http_client import MorgHTTPSocket
 from utilities.api.status_socket import StatusSocket
 
 
-class OSRSBarbFishing(OSRSBot):
+class OSRSTemplate(OSRSBot):
     def __init__(self):
-        bot_title = "Barbairan Fishing"
-        description = "AFK Barbarian Fishing"
+        bot_title = "<Script name here>"
+        description = "<Script description here>"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during headless testing)
         self.running_time = 1
@@ -23,7 +23,10 @@ class OSRSBarbFishing(OSRSBot):
         see, and the possible values the user can select. The key is used in the save_options function to
         unpack the dictionary of options after the user has selected them.
         """
-        self.buildStandOpt()
+        self.options_builder.add_text_edit_option("running_time", "How long to run (minutes)?", "Number Only")
+        #self.options_builder.add_text_edit_option("text_edit_example", "Text Edit Example", "Placeholder text here")
+        #self.options_builder.add_checkbox_option("multi_select_example", "Multi-select Example", ["A", "B", "C"])
+        #self.options_builder.add_dropdown_option("menu_example", "Menu Example", ["A", "B", "C"])
 
     def save_options(self, options: dict):
         """
@@ -32,14 +35,24 @@ class OSRSBarbFishing(OSRSBot):
         False.
         """
         for option in options:
-            if self.setStandOpt(option,options[option]):
-                self.log_msg(f"Set option: {options[option]}")
+            if option == "running_time":
+                if isinstance(int(options[option]), int):
+                    self.running_time = int(options[option])
+                else:
+                    self.running_time = 60
+                    self.log_msg("You didn't enter a number, so you've been set to 60 minutes")
+            #elif option == "text_edit_example":
+            #    self.log_msg(f"Text edit example: {options[option]}")
+            #elif option == "multi_select_example":
+            #    self.log_msg(f"Multi-select example: {options[option]}")
+            #elif option == "menu_example":
+            #    self.log_msg(f"Menu example: {options[option]}")
             else:
                 self.log_msg(f"Unknown option: {option}")
                 print("Developer: ensure that the option keys are correct, and that options are being unpacked correctly.")
                 self.options_set = False
                 return
-        self.log_msg(f"Running time: {self.runningTime} minutes.")
+        self.log_msg(f"Running time: {self.running_time} minutes.")
         self.log_msg("Options set successfully.")
         self.options_set = True
 
@@ -59,58 +72,18 @@ class OSRSBarbFishing(OSRSBot):
           operator to access their functions.
         """
         # Setup APIs
-        api_m = MorgHTTPSocket()
+        # api_m = MorgHTTPSocket()
         # api_s = StatusSocket()
 
         # Main loop
         start_time = time.time()
-        end_time = self.runningTime * 60
-        # Starts out by finding a node
-        self.fishing()
+        end_time = self.running_time * 60
         while time.time() - start_time < end_time:
-            datime = time.time() - start_time
-            # Check if inventory is full, if so dump the inventory
-            fish_slots = api_m.get_inv_item_indices(ids.raw_fish)
-            if api_m.get_is_inv_full():
-                self.log_msg("Inventory is full")
-                # Low chance of long sleep, always shorter sleep
-                # As if afking fishing
-                if rd.random_chance(probability=0.05):
-                    self.log_msg("Taking long break")
-                    self.take_break(max_seconds=60, fancy=True)
-                self.take_break(max_seconds=10, fancy=True)
-                # Drop the fish then continue fishing
-                self.drop(fish_slots)
-                time.sleep(3)
-                self.fishing()
+            # -- Perform bot actions here --
+            # Code within this block will LOOP until the bot is stopped.
 
-            # Check if the player is idle by checking the top left activity
-            if not self.is_player_doing_action("Fishing"):
-                self.log_msg("Player isn't fishing")
-                # Low chance of long sleep, always shorter sleep
-                # As if afking fishing
-                if rd.random_chance(probability=0.05):
-                    self.log_msg("Taking long break")
-                    self.take_break(max_seconds=60, fancy=True)
-                self.take_break(max_seconds=20, fancy=True)
-                # Finds a new node then continues fishing
-                self.fishing()
-            self.sleepRunner(datime)
-            time.sleep(1)
-            
             self.update_progress((time.time() - start_time) / end_time)
 
         self.update_progress(1)
         self.log_msg("Finished.")
         self.stop()
-
-    # Method for fishing.
-    # Looks for closest node and clicks
-    # Sleeps for 5 seconds to allow time for status panel to update
-    def fishing(self):
-        if fish := self.get_nearest_tag(clr.PINK):
-                self.mouse.move_to(fish.random_point())
-                self.mouse.click()
-                self.log_msg("Found a new node")
-                time.sleep(5)
-    
