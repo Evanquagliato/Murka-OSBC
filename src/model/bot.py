@@ -308,7 +308,7 @@ class Bot(ABC):
         self.log_msg("Logging out...")
         self.mouse.move_to(self.win.cp_tabs[10].random_point())
         self.mouse.click()
-        time.sleep(1)
+        time.sleep(3)
         self.mouse.move_rel(0, -53, 5, 5)
         self.mouse.click()
 
@@ -392,6 +392,7 @@ class Bot(ABC):
             self.logoutTimer = rd.fancy_normal_sample(3600,5400) + timeClock
             self.logoutTimer = round(self.logoutTimer)
             self.log_msg(f"Next normal break at {self.logoutTimer / 60} minutes")
+            return True
 
         if timeClock > self.longTimer and self.takeLongLogouts:
             self.logout()
@@ -400,6 +401,7 @@ class Bot(ABC):
             self.longTimer = rd.fancy_normal_sample(14400,21600) + timeClock
             self.longTimer = round(self.longTimer)
             self.log_msg(f"Next long break at {self.longTimer / 60} minutes")
+            return True
 
         if timeClock > self.extremeTimer and self.takeExtremeLogouts:
             self.logout()
@@ -408,6 +410,7 @@ class Bot(ABC):
             self.extremeTimer = rd.fancy_normal_sample(50400,57600) + timeClock
             self.extremeTimer = round(self.extremeTimer)
             self.log_msg(f"Next extreme break at {self.extremeTimer / 60} minutes")
+            return True
 
     # --- Player Status Functions ---
     def has_hp_bar(self) -> bool:

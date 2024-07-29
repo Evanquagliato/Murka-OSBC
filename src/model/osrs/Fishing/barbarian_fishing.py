@@ -70,8 +70,9 @@ class OSRSBarbFishing(OSRSBot):
         while time.time() - start_time < end_time:
             datime = time.time() - start_time
             # Check if inventory is full, if so dump the inventory
-            fish_slots = api_m.get_inv_item_indices(ids.raw_fish)
-            if api_m.get_is_inv_full():
+            # Or 2% chance to dump early
+            if api_m.get_is_inv_full() or rd.random_chance(probability=0.02):
+                fish_slots = api_m.get_inv_item_indices(ids.raw_fish)
                 self.log_msg("Inventory is full")
                 # Low chance of long sleep, always shorter sleep
                 # As if afking fishing
