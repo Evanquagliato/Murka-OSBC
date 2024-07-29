@@ -321,12 +321,12 @@ class Bot(ABC):
         if login := imsearch.search_img_in_rect(login_img, self.win.game_view):
             self.mouse.move_to(login.random_point())
             self.mouse.click()
-            self.take_break(min_seconds=10, max_seconds=15, fancy=True)
+            self.take_break(min_seconds=15, max_seconds=20, fancy=True)
             play_img = imsearch.BOT_IMAGES.joinpath("ui_templates", "click_to_play.png")
             if play := imsearch.search_img_in_rect(play_img, self.win.game_view):
                 self.mouse.move_to(play.random_point())
                 self.mouse.click()
-                self.take_break(min_seconds=5, max_seconds=10, fancy=True)
+                self.take_break(min_seconds=15, max_seconds=20, fancy=True)
             
 
     def take_break(self, min_seconds: int = 1, max_seconds: int = 30, fancy: bool = False):

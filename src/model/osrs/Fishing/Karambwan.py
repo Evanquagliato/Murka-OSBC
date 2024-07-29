@@ -96,7 +96,7 @@ class OSRSKarambwan(OSRSBot):
 
             # Checks break times to see if its time to break
             if self.sleepRunner(time.time() - start_time):
-                time.sleep(5)
+                time.sleep(10)
                 self.mouse.move_to(self.win.cp_tabs[4].random_point(), mouseSpeed="fastest")
                 self.mouse.click()
             time.sleep(1)
