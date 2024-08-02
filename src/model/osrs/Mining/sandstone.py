@@ -103,10 +103,10 @@ class OSRSSandstone(OSRSBot):
             self.log_msg("Found a node, mining..")
             end = 0
             while not self.is_player_doing_action("Mining"):
-                #end += 1
+                end += 1
                 time.sleep(.1)
-                #if end == 50:
-                #    continue
+                if end == 50:
+                    break
             if rd.random_chance(probability=0.05):
                 self.take_break(min_seconds=3, max_seconds=5,fancy=True)
             if rd.random_chance(probability=0.02):
