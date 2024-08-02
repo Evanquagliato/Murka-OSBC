@@ -78,8 +78,9 @@ class OSRSBarbFishing(OSRSBot):
                 # As if afking fishing
                 if rd.random_chance(probability=0.05):
                     self.log_msg("Taking long break")
-                    self.take_break(max_seconds=60, fancy=True)
-                self.take_break(max_seconds=10, fancy=True)
+                    self.take_break(max_seconds=30, fancy=True)
+
+                self.take_break(max_seconds=5, fancy=True)
                 # Drop the fish then continue fishing
                 self.drop(fish_slots)
                 time.sleep(3)
@@ -92,8 +93,9 @@ class OSRSBarbFishing(OSRSBot):
                 # As if afking fishing
                 if rd.random_chance(probability=0.05):
                     self.log_msg("Taking long break")
-                    self.take_break(max_seconds=60, fancy=True)
-                self.take_break(max_seconds=20, fancy=True)
+                    self.take_break(max_seconds=30, fancy=True)
+
+                self.take_break(max_seconds=5, fancy=True)
                 # Finds a new node then continues fishing
                 self.fishing()
             self.sleepRunner(datime)
