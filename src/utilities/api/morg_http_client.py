@@ -28,7 +28,7 @@ class MorgHTTPSocket:
         self.equip_endpoint = "equip"
         self.events_endpoint = "events"
 
-        self.timeout = 1
+        self.timeout = 3
 
     def __do_get(self, endpoint: str) -> dict:
         """
