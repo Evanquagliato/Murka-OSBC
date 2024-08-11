@@ -5,3 +5,5 @@ from .Fishing.Karambwan import OSRSKarambwan
 from .Fishing.Karambwanji import OSRSKarambwanji
 from .Runecrafting.Blood_Runes import OSRSBloods
 from .Mining.sandstone import OSRSSandstone
+from .Agility.Seers_Agility import OSRSSeers
+from .Herblore.Potions import OSRSPotions
