@@ -6,7 +6,7 @@ import utilities.random_util as rd
 from model.osrs.osrs_bot import OSRSBot
 from utilities.api.morg_http_client import MorgHTTPSocket
 from utilities.api.status_socket import StatusSocket
-
+import utilities.imagesearch as imsearch
 
 class OSRSBloods(OSRSBot):
     def __init__(self):
@@ -119,6 +119,7 @@ class OSRSBloods(OSRSBot):
                         self.mouse.click()
                         self.move_camera(horizontal=-90,vertical=0)
                         self.log_msg("Running toward altar")
+
                         while not api_m.get_first_occurrence(ids.DARK_ESSENCE_BLOCK):
                             self.log_msg("Waiting for essence to change...", overwrite=True)
                             time.sleep(1)
@@ -128,19 +129,15 @@ class OSRSBloods(OSRSBot):
                         self.mouse.move_to(firstClick.random_point())
                         self.mouse.click()
                         time.sleep(10)
-                        self.log_msg("Searching for cyan tiles...")
-                        while not self.get_all_tagged_in_rect(self.win.game_view,clr.CYAN):
-                            self.log_msg("Searching for cyan tiles...",overwrite=True)
-                            time.sleep(1)
-                        self.log_msg("Cyan tiles found, clicking")
-                        secondClick = self.get_all_tagged_in_rect(self.win.game_view,clr.CYAN)
-                        secondClick = secondClick[round(rd.truncated_normal_sample(0,3))]
-                        self.mouse.move_to(secondClick.random_point())
+
+                        mapImage = imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("runecrafting",'minimapclick.png'),self.win.game_view)
+                        self.mouse.move_to(mapImage.random_point())
                         self.mouse.click()
                         self.log_msg("Searching for blood altar...")
                         while not self.get_nearest_tag(self.win.game_view,clr.YELLOW):
                             self.log_msg("Searching for blood altar...", overwrite=True)
                             time.sleep(1)
+                            
                         if bloodAltar := self.get_nearest_tag(self.win.game_view,clr.YELLOW):
                             self.log_msg("Blood altar found, clicking it")
                             self.mouse.move_to(bloodAltar.random_point())

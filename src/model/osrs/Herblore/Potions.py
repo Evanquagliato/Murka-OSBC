@@ -283,10 +283,10 @@ class OSRSPotions(OSRSBot):
     # Function to change bank tabs using bank tagging
     # Pass in the image of the bank tag, it will find it and click
     def tabSwitch(self,img):
-        tab = imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("Herblore",img),self.win.game_view)
-        self.mouse.move_to(tab.random_point())
-        self.mouse.click()
-        self.mouse.move_rel(x=-50,y=0,x_var=20,y_var=20)
+        if tab := imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("Herblore",img),self.win.game_view):
+            self.mouse.move_to(tab.random_point())
+            self.mouse.click()
+            self.mouse.move_rel(x=-50,y=0,x_var=20,y_var=20)
 
     # Function to open bank. Finds color CYAN and clicks
     def openBank(self):
