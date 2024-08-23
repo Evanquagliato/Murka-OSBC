@@ -8,3 +8,4 @@ from .Mining.sandstone import OSRSSandstone
 from .Agility.Seers_Agility import OSRSSeers
 from .Herblore.Potions import OSRSPotions
 from .Testing.template import OSRSTemplate
+from .Crafting.SuperGlassMake import OSRSSuperGlassMake
