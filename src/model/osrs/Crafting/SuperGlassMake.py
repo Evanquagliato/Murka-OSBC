@@ -51,7 +51,8 @@ class OSRSSuperGlassMake(OSRSBot):
         while time.time() - start_time < end_time:
             
             # Write code here
-            self.banking('Giant_seaweed_bank.png','Bucket_of_sand_bank.png')
+            if not self.banking('Giant_seaweed_bank.png','Bucket_of_sand_bank.png'):
+                self.stop()
             self.castSpell()
 
             # Checks break times to see if its time to break
@@ -69,7 +70,9 @@ class OSRSSuperGlassMake(OSRSBot):
         if glassSpell := imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("Crafting",'Superglass_make.png'),self.win.control_panel):
             self.mouse.move_to(glassSpell.random_point())
             self.mouse.click()
-            self.take_break(1,2)
+            self.take_break(2,3)
+        else:
+            self.stop()
 
     def banking(self,img1,img2):
         # Checks if the bank is already open by looking for the deposit button
@@ -83,7 +86,7 @@ class OSRSSuperGlassMake(OSRSBot):
             # If there are any items in the inventory, deposit them
             self.mouse.move_to(self.win.inventory_slots[0].random_point())
             self.mouse.click()
-        
+        time.sleep(1)
         # Search the bank for the first image
         # If not found, return false so loop moves to next item
         if not self.bankSearch(img1,3):
@@ -99,12 +102,14 @@ class OSRSSuperGlassMake(OSRSBot):
     # Pass in a string of the image file name
     def bankSearch(self,img,clicks):
         # Searches for the image in the 'Herblore' folder
+        
         if image := imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("Crafting",img),self.win.game_view):
             # If found, it checks mouseover text. 
             # If mouseover text contains 'Withdraw', then withdraw
             # Otherwise, return false as the bank is all out of that item
             self.log_msg(f'{img} Found')
             self.mouse.move_to(image.random_point())
+            self.take_break(0,0)
             if self.mouseover_text('Withdraw'):
                 for x in range(0,clicks):
                     self.mouse.click()

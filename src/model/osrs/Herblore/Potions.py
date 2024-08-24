@@ -245,6 +245,7 @@ class OSRSPotions(OSRSBot):
             # Otherwise, return false as the bank is all out of that item
             self.log_msg(f'{img} Found')
             self.mouse.move_to(image.random_point())
+            self.take_break(0,0)
             if self.mouseover_text('Withdraw'):
                 self.mouse.click()
             else:
@@ -290,7 +291,7 @@ class OSRSPotions(OSRSBot):
 
     # Function to open bank. Finds color CYAN and clicks
     def openBank(self):
-        banker = self.get_nearest_tag(clr.CYAN)
+        banker = self.get_nearest_tag(clr.PINK)
         self.mouse.move_to(banker.random_point())
         self.mouse.click()
         time.sleep(rd.fancy_normal_sample(.6,1.5))
