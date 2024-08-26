@@ -9,3 +9,5 @@ from .Agility.Seers_Agility import OSRSSeers
 from .Herblore.Potions import OSRSPotions
 from .Testing.template import OSRSTemplate
 from .Crafting.SuperGlassMake import OSRSSuperGlassMake
+from .Crafting.Glassblow import OSRSGlassblow
+from .Combat.AutoCombat import OSRSAutoCombat

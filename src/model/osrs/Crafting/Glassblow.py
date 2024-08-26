@@ -1,16 +1,17 @@
 import time
-import utilities.imagesearch as imsearch
+
 import utilities.api.item_ids as ids
 import utilities.color as clr
 import utilities.random_util as rd
 from model.osrs.osrs_bot import OSRSBot
 from utilities.api.morg_http_client import MorgHTTPSocket
 from utilities.api.status_socket import StatusSocket
+from pyautogui import press, typewrite, hotkey
+import utilities.imagesearch as imsearch
 
-
-class OSRSSuperGlassMake(OSRSBot):
+class OSRSGlassblow(OSRSBot):
     def __init__(self):
-        bot_title = "Super Glass Make"
+        bot_title = "Glassblowing"
         description = "Bottom Text"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during headless testing)
@@ -39,10 +40,7 @@ class OSRSSuperGlassMake(OSRSBot):
 
     def main_loop(self):
         # Setup APIs
-        api_m = MorgHTTPSocket()
-
-        # Set up image vars
-
+        # api_m = MorgHTTPSocket()
 
         # Main loop
         start_time = time.time()
@@ -51,10 +49,9 @@ class OSRSSuperGlassMake(OSRSBot):
         while time.time() - start_time < end_time:
             
             # Write code here
-            if not self.banking('Giant_seaweed_bank.png','Bucket_of_sand_bank.png'):
+            if not self.banking('Molten_glass_bank.png'):
                 self.stop()
-            self.castSpell()
-
+            self.blowGlass()
             # Checks break times to see if its time to break
             self.sleepRunner(time.time() - start_time)
             time.sleep(1)
@@ -64,43 +61,39 @@ class OSRSSuperGlassMake(OSRSBot):
         self.log_msg("Finished.")
         self.stop()
 
-
-    def castSpell(self):
+    def blowGlass(self):
         self.log_msg('No glass in inv, casting spell')
-        if glassSpell := imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("Crafting",'Superglass_make.png'),self.win.control_panel):
-            self.mouse.move_to(glassSpell.random_point())
-            self.mouse.click()
-            self.take_break(2,3)
-        else:
-            self.stop()
+        self.mouse.move_to(self.win.inventory_slots[0].random_point())
+        self.mouse.click()
+        self.mouse.move_to(self.win.inventory_slots[1].random_point())
+        self.mouse.click()
+        time.sleep(rd.fancy_normal_sample(.6,1.5))
+        press('Space')
+        self.take_break(48,55)
 
-    def banking(self,img1,img2):
+    def banking(self,img1):
         # Checks if the bank is already open by looking for the deposit button
         if imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("bank",'deposit_all.png'),self.win.game_view):
             # If the bank is open, and there are items in the inventory, deposit items
-            self.mouse.move_to(self.win.inventory_slots[0].random_point())
+            self.mouse.move_to(self.win.inventory_slots[1].random_point())
             self.mouse.click()
         # If the bank is not already open
         else:
             self.openBank()
             # If there are any items in the inventory, deposit them
-            self.mouse.move_to(self.win.inventory_slots[0].random_point())
+            self.mouse.move_to(self.win.inventory_slots[1].random_point())
             self.mouse.click()
         time.sleep(1)
         # Search the bank for the first image
         # If not found, return false so loop moves to next item
-        if not self.bankSearch(img1,3):
-            return False
-        # Search the bank for the second image
-        # If not found, return false so loop moves to next item
-        if not self.bankSearch(img2,1):
-            return False    
+        if not self.bankSearch(img1):
+            return False 
         self.exitBank()
         return True
     
     # Function to search the bank for an image
     # Pass in a string of the image file name
-    def bankSearch(self,img,clicks):
+    def bankSearch(self,img):
         # Searches for the image in the 'Herblore' folder
         
         if image := imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("Crafting",img),self.win.game_view):
@@ -111,19 +104,15 @@ class OSRSSuperGlassMake(OSRSBot):
             self.mouse.move_to(image.random_point())
             self.take_break(0,0)
             if self.mouseover_text('Withdraw'):
-                for x in range(0,clicks):
-                    self.mouse.click()
-                    self.take_break(0,0)
-                    x += 1
+                self.mouse.click()
+                self.take_break(0,0)
             else:
                 # Try one more time
                 self.mouse.move_to(image.random_point())
                 self.take_break(0,0)
                 if self.mouseover_text('Withdraw'):
-                    for x in range(0,clicks):
-                        self.mouse.click()
-                        self.take_break(0,0)
-                        x += 1
+                    self.mouse.click()
+                    self.take_break(0,0)
                 else:
                     self.log_msg('Empty placeholder, ending')
                     return False

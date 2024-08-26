@@ -249,8 +249,12 @@ class OSRSPotions(OSRSBot):
             if self.mouseover_text('Withdraw'):
                 self.mouse.click()
             else:
-                self.log_msg('Empty placeholder, moving on')
-                return False
+                self.mouse.move_to(image.random_point())
+                self.take_break(0,0)
+                if self.mouseover_text('Withdraw'):
+                    self.mouse.click()
+                    self.log_msg('Empty placeholder, moving on')
+                    return False
             return True
         # If the bank can't find the image, return false
         else:
