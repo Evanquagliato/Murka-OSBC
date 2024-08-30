@@ -48,7 +48,10 @@ class OSRSBloods(OSRSBot):
         while time.time() - start_time < end_time:
             
             # Write code here
-
+            '''
+            
+            
+            '''
             # Checks break times to see if its time to break
             self.sleepRunner(time.time() - start_time)
             time.sleep(1)
